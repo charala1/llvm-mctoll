@@ -2089,7 +2089,7 @@ bool X86MachineInstructionRaiser::raiseCompareMachineInstr(
   // Is this a sub instruction?
   bool isSUBInst = instrNameStartsWith(MI, "SUB");
 
-  SmallVector<Value *, 2> OpValues = {nullptr, nullptr};
+  SmallVector<Value *, 2> OpValues {nullptr, nullptr};
 
   // Get operand indices
   if (isMemCompare) {
