@@ -80,11 +80,13 @@ string getEflagName(unsigned EFBit) {
 }
 
 bool is64BitPhysReg(unsigned int PReg) {
-  return X86MCRegisterClasses[X86::GR64RegClassID].contains(PReg);
+  return X86MCRegisterClasses[X86::GR64RegClassID].contains(PReg)
+    || X86MCRegisterClasses[X86::FR64RegClassID].contains(PReg);
 }
 
 bool is32BitPhysReg(unsigned int PReg) {
-  return X86MCRegisterClasses[X86::GR32RegClassID].contains(PReg);
+  return X86MCRegisterClasses[X86::GR32RegClassID].contains(PReg)
+    || X86MCRegisterClasses[X86::FR32RegClassID].contains(PReg);
 }
 
 bool is16BitPhysReg(unsigned int PReg) {
