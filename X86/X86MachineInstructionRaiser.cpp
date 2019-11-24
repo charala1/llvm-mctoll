@@ -2442,8 +2442,8 @@ bool X86MachineInstructionRaiser::raiseMemRefMachineInstr(
     success = raiseStoreIntToFloatRegInstr(MI, MemoryRefValue);
     break;
   default:
-    outs() << "Unhandled memory referencing instruction.\n";
     LLVM_DEBUG(MI.dump());
+    assert ( false && "Unhandled memory referencing instruction" );
   }
   return success;
 }
