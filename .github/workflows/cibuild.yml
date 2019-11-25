@@ -13,11 +13,26 @@ jobs:
     steps:
     - name: prerequisites
       run: |
-        echo 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main' | sudo tee -a /etc/apt/sources.list
-        sudo apt update
-        sudo apt install -y ninja-build clang
-        sudo update-alternatives --install /usr/bin/cc  cc  /usr/bin/clang 200
-        sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 200
+        # Install wget and gnupg2
+        # Needed to add the LLVM repository to apt sources.
+        sudo apt-get update && sudo apt-get install -y wget gnupg2
+
+        # Add the LLVM repository to apt sources.
+        echo 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main' \
+          | sudo tee /etc/apt/sources.list.d/llvm.list
+
+        # Get the repository key.
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+
+        # Install ninja-build and clang-9.
+        sudo apt-get update && sudo apt-get install -y ninja-build clang-9
+
+        # Change the system compiler to use the newly installed clang-9.
+        sudo update-alternatives \
+          --install /usr/bin/cc cc /usr/bin/clang-9 200
+        sudo update-alternatives \
+          --install /usr/bin/c++ c++ /usr/bin/clang++-9 200 \
+
       shell: bash
     - name: clone
       run: |
@@ -37,7 +52,10 @@ jobs:
         echo "::add-matcher::$GITHUB_WORKSPACE/llvm/tools/llvm-mctoll/.github/cpp.json"
     - name: Debug Build and Test
       working-directory: build/Debug
-      run: cmake -G Ninja -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_ENABLE_PROJECTS="clang;lld" -DLLVM_ENABLE_ASSERTIONS=ON -DCMAKE_BUILD_TYPE=Debug ../../llvm &&  ninja clang && ninja opt &&  ninja lld && ninja check-mctoll
+      run: |
+        cmake -G Ninja -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_ENABLE_PROJECTS="clang;lld" -DLLVM_ENABLE_ASSERTIONS=ON -DCMAKE_BUILD_TYPE=Debug ../../llvm
+        ninja clang opt lld
+        ninja check-mctoll
       shell: bash
     - name: Upload artifacts
       uses: actions/upload-artifact@v1
@@ -51,11 +69,26 @@ jobs:
     steps:
     - name: prerequisites
       run: |
-        echo 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic main' | sudo tee -a /etc/apt/sources.list
-        sudo apt update
-        sudo apt install -y ninja-build clang
-        sudo update-alternatives --install /usr/bin/cc  cc  /usr/bin/clang 200
-        sudo update-alternatives --install /usr/bin/c++ c++ /usr/bin/clang++ 200
+        # Install wget and gnupg2
+        # Needed to add the LLVM repository to apt sources.
+        sudo apt-get update && sudo apt-get install -y wget gnupg2
+
+        # Add the LLVM repository to apt sources.
+        echo 'deb http://apt.llvm.org/bionic/ llvm-toolchain-bionic-9 main' \
+          | sudo tee /etc/apt/sources.list.d/llvm.list
+
+        # Get the repository key.
+        wget -O - https://apt.llvm.org/llvm-snapshot.gpg.key | sudo apt-key add -
+
+        # Install ninja-build and clang-9.
+        sudo apt-get update && sudo apt-get install -y ninja-build clang-9
+
+        # Change the system compiler to use the newly installed clang-9.
+        sudo update-alternatives \
+          --install /usr/bin/cc cc /usr/bin/clang-9 200
+        sudo update-alternatives \
+          --install /usr/bin/c++ c++ /usr/bin/clang++-9 200 \
+
       shell: bash
     - name: clone
       run: |
@@ -75,7 +108,10 @@ jobs:
         echo "::add-matcher::$GITHUB_WORKSPACE/llvm/tools/llvm-mctoll/.github/cpp.json"
     - name: Release Build and Test
       working-directory: build/Release
-      run: cmake -G Ninja -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_ENABLE_PROJECTS="clang;lld" -DLLVM_ENABLE_ASSERTIONS=ON -DCMAKE_BUILD_TYPE=Release ../../llvm &&  ninja clang && ninja opt &&  ninja lld && ninja check-mctoll
+      run: |
+        cmake -G Ninja -DLLVM_TARGETS_TO_BUILD="X86;ARM" -DLLVM_ENABLE_PROJECTS="clang;lld" -DLLVM_ENABLE_ASSERTIONS=ON -DCMAKE_BUILD_TYPE=Release ../../llvm
+        ninja clang opt lld
+        ninja check-mctoll
       shell: bash
     - name: Upload artifacts
       uses: actions/upload-artifact@v1
