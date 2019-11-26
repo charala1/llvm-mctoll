@@ -2416,36 +2416,37 @@ bool X86MachineInstructionRaiser::raiseMemRefMachineInstr(
   // Now that we have all necessary information about memory reference and
   // the load/store operand, we can raise the memory referencing instruction
   // according to the opcode.
-  bool success = false;
+
   switch (getInstructionKind(Opcode)) {
     // Move register or immediate to memory
-  case InstructionKind::MOV_TO_MEM: {
-    success = raiseMoveToMemInstr(MI, MemoryRefValue);
-  } break;
-  case InstructionKind::INPLACE_MEM_OP:
-    success = raiseInplaceMemOpInstr(MI, MemoryRefValue);
-    break;
-  // Move register from memory
-  case InstructionKind::MOV_FROM_MEM: {
-    success = raiseMoveFromMemInstr(MI, MemoryRefValue);
-  } break;
-  case InstructionKind::BINARY_OP_RM: {
-    success = raiseBinaryOpMemToRegInstr(MI, MemoryRefValue);
-  } break;
-  case InstructionKind::DIVIDE_MEM_OP: {
-    success = raiseDivideInstr(MI, MemoryRefValue);
-  } break;
-  case InstructionKind::LOAD_FPU_REG:
-    success = raiseLoadIntToFloatRegInstr(MI, MemoryRefValue);
-    break;
-  case InstructionKind::STORE_FPU_REG:
-    success = raiseStoreIntToFloatRegInstr(MI, MemoryRefValue);
-    break;
-  default:
-    LLVM_DEBUG(MI.dump());
-    assert ( false && "Unhandled memory referencing instruction" );
+    case InstructionKind::MOV_TO_MEM: {
+      return raiseMoveToMemInstr(MI, MemoryRefValue);
+    }
+    case InstructionKind::INPLACE_MEM_OP: {
+      return raiseInplaceMemOpInstr(MI, MemoryRefValue);
+    }
+    // Move register from memory
+    case InstructionKind::MOV_FROM_MEM: {
+      return raiseMoveFromMemInstr(MI, MemoryRefValue);
+    }
+    case InstructionKind::BINARY_OP_RM: {
+      return raiseBinaryOpMemToRegInstr(MI, MemoryRefValue);
+    }
+    case InstructionKind::DIVIDE_MEM_OP: {
+      return raiseDivideInstr(MI, MemoryRefValue);
+    }
+    case InstructionKind::LOAD_FPU_REG: {
+      return raiseLoadIntToFloatRegInstr(MI, MemoryRefValue);
+    }
+    case InstructionKind::STORE_FPU_REG: {
+      return raiseStoreIntToFloatRegInstr(MI, MemoryRefValue);
+    }
+    default: {
+      LLVM_DEBUG(MI.dump());
+      assert ( false && "Unhandled memory referencing instruction" );
+    }
   }
-  return success;
+  return false;
 }
 
 bool X86MachineInstructionRaiser::raiseSetCCMachineInstr(
